@@ -1,0 +1,14 @@
+# Env secrets
+.env
+code/.env
+
+# Python caching
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db
