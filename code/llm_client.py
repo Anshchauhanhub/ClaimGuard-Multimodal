@@ -44,6 +44,20 @@ class LLMClient:
         if elapsed < SLEEP_BETWEEN_CALLS:
             time.sleep(SLEEP_BETWEEN_CALLS - elapsed)
 
+    @staticmethod
+    def _parse_retry_after(error_text: str) -> Optional[float]:
+        """Parse 'Please try again in XmYs' from Groq error messages."""
+        import re
+        match = re.search(r'try again in (\d+)m([\d.]+)s', error_text)
+        if match:
+            minutes = int(match.group(1))
+            seconds = float(match.group(2))
+            return minutes * 60 + seconds
+        match = re.search(r'try again in ([\d.]+)s', error_text)
+        if match:
+            return float(match.group(1))
+        return None
+
     def _build_image_content_parts(
         self, image_paths: List[str], base_dir: Path
     ) -> List[Dict]:
@@ -125,12 +139,23 @@ class LLMClient:
                     time.sleep(RETRY_BASE_DELAY * attempt)
             except Exception as e:
                 self.total_retries += 1
-                err_str = str(e).lower()
-                if "429" in err_str or "rate" in err_str or "quota" in err_str:
-                    wait = RETRY_BASE_DELAY * (2 ** attempt)
+                err_str = str(e)
+                err_lower = err_str.lower()
+
+                # Detect TPD (tokens per day) limit — parse exact wait time
+                if "tokens per day" in err_lower or "tpd" in err_lower:
+                    wait = self._parse_retry_after(err_str)
+                    if wait is None:
+                        wait = 300  # default 5 min wait for daily limits
+                    print(f"  ⚠ Daily token limit hit! Waiting {wait}s for reset...")
+                    time.sleep(wait + 5)  # add 5s buffer
+                elif "429" in err_str or "rate" in err_lower or "quota" in err_lower:
+                    wait = self._parse_retry_after(err_str)
+                    if wait is None:
+                        wait = RETRY_BASE_DELAY * (2 ** attempt)
                     print(f"  ⚠ Rate limited (attempt {attempt}), waiting {wait}s...")
                     time.sleep(wait)
-                elif "500" in err_str or "503" in err_str or "server" in err_str:
+                elif "500" in err_str or "503" in err_str or "server" in err_lower:
                     wait = RETRY_BASE_DELAY * attempt
                     print(f"  ⚠ Server error (attempt {attempt}), waiting {wait}s...")
                     time.sleep(wait)

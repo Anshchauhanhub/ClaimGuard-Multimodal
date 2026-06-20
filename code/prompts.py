@@ -3,7 +3,7 @@
 from typing import List, Dict
 
 
-def build_few_shot_examples(sample_claims: List[Dict], claim_object: str, max_examples: int = 3) -> str:
+def build_few_shot_examples(sample_claims: List[Dict], claim_object: str, max_examples: int = 1) -> str:
     """Build few-shot examples from sample_claims filtered by claim_object."""
     matching = [r for r in sample_claims if r.get("claim_object") == claim_object]
     # Pick a diverse set: one supported, one contradicted, one not_enough_info if available

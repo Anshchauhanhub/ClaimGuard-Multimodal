@@ -47,7 +47,7 @@ def get_image_ids(image_paths_str: str) -> List[str]:
     return [Path(p).stem for p in paths]
 
 
-def load_image_as_base64(image_path: Path, max_dim: int = 1024) -> Optional[str]:
+def load_image_as_base64(image_path: Path, max_dim: int = 512) -> Optional[str]:
     """Load an image, convert to JPEG if needed, resize if large, return base64."""
     if not image_path.exists():
         return None

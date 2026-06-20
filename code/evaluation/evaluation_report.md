@@ -4,20 +4,21 @@
 
 | Field | Accuracy | Correct / Total |
 |-------|----------|-----------------|
-| claim_status | 80.0% | 16/20 |
-| issue_type | 60.0% | 12/20 |
-| object_part | 75.0% | 15/20 |
-| severity | 70.0% | 14/20 |
+| claim_status | 75.0% | 15/20 |
+| issue_type | 55.0% | 11/20 |
+| object_part | 80.0% | 16/20 |
+| severity | 65.0% | 13/20 |
 | evidence_standard_met | 70.0% | 14/20 |
-| valid_image | 90.0% | 18/20 |
-| **overall_exact_match** | **40.0%** | **8/20** |
-| risk_flags (Jaccard) | 63.7% | — |
+| valid_image | 85.0% | 17/20 |
+| **overall_exact_match** | **35.0%** | **7/20** |
+| risk_flags (Jaccard) | 68.2% | — |
 
 ## 2. Notable Mismatches
 
 ### claim_status
 - **user_001**: expected `supported`, got `contradicted`
 - **user_002**: expected `not_enough_information`, got `contradicted`
+- **user_005**: expected `contradicted`, got `supported`
 - **user_020**: expected `contradicted`, got `supported`
 - **user_034**: expected `contradicted`, got `not_enough_information`
 
@@ -26,21 +27,20 @@
 - **user_002**: expected `broken_part`, got `scratch`
 - **user_007**: expected `broken_part`, got `crack`
 - **user_005**: expected `scratch`, got `dent`
-- **user_011**: expected `stain`, got `water_damage`
+- **user_006**: expected `unknown`, got `none`
 
 ### object_part
-- **user_005**: expected `rear_bumper`, got `unknown`
+- **user_001**: expected `rear_bumper`, got `unknown`
 - **user_006**: expected `headlight`, got `unknown`
-- **user_020**: expected `trackpad`, got `base`
 - **user_030**: expected `seal`, got `package_side`
 - **user_034**: expected `seal`, got `package_corner`
 
 ### severity
 - **user_001**: expected `medium`, got `high`
-- **user_002**: expected `unknown`, got `medium`
+- **user_002**: expected `unknown`, got `low`
 - **user_005**: expected `low`, got `medium`
+- **user_006**: expected `unknown`, got `none`
 - **user_020**: expected `none`, got `low`
-- **user_033**: expected `low`, got `unknown`
 
 ### evidence_standard_met
 - **user_001**: expected `true`, got `false`
@@ -50,6 +50,7 @@
 - **user_033**: expected `true`, got `false`
 
 ### valid_image
+- **user_003**: expected `true`, got `false`
 - **user_032**: expected `false`, got `true`
 - **user_034**: expected `true`, got `false`
 
@@ -59,9 +60,9 @@
 - **Retries**: 0
 - **Failures**: 0
 - **Images Processed**: 29
-- **Input Tokens**: ~65112
-- **Output Tokens**: ~2994
-- **Eval Runtime**: 194.3s (3.2min)
+- **Input Tokens**: ~61632
+- **Output Tokens**: ~2991
+- **Eval Runtime**: 191.1s (3.2min)
 
 ### Cost Estimation (full test set: 45 claims, ~80 images)
 

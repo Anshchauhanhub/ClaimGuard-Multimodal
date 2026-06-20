@@ -17,14 +17,14 @@ OUTPUT_CSV = CODE_DIR / "output.csv"
 # ─── Groq API Config ───
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
-PRIMARY_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"  # multimodal, fast
+PRIMARY_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
 FALLBACK_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
 
 # ─── Rate Limiting ───
-MAX_RPM = 14                              # conservative to avoid 429s
-SLEEP_BETWEEN_CALLS = 60.0 / MAX_RPM     # ~4.3s between calls
-MAX_RETRIES = 3
-RETRY_BASE_DELAY = 8                     # exponential backoff base
+MAX_RPM = 10
+SLEEP_BETWEEN_CALLS = 60.0 / MAX_RPM     # ~6s between calls
+MAX_RETRIES = 5
+RETRY_BASE_DELAY = 10
 
 # ─── Allowed Values ───
 CLAIM_STATUSES = ["supported", "contradicted", "not_enough_information"]
