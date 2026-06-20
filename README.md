@@ -2,7 +2,7 @@
 
 A production-grade, highly resilient damage claim verification system built for the **HackerRank Orchestrate** challenge. 
 
-ClaimGuard utilizes **Llama 4 Scout** (via Groq) to analyze submitted images against claim transcripts, user claim histories, and object-specific evidence requirements to automatically verify vehicle, laptop, and package damage claims.
+ClaimGuard utilizes **Google Gemini 2.0 Flash** (via Google Generative AI) to analyze submitted images against claim transcripts, user claim histories, and object-specific evidence requirements to automatically verify vehicle, laptop, and package damage claims.
 
 ---
 
@@ -12,18 +12,18 @@ ClaimGuard utilizes **Llama 4 Scout** (via Groq) to analyze submitted images aga
 ┌─────────────────────────────────────────────────────────────┐
 │                    code/main.py (Pipeline)                   │
 ├─────────────┬──────────────┬───────────────┬────────────────┤
-│ data_loader │   prompts    │  llm_client   │   postprocess  │
-│  • CSV/Image│  • System    │  • Groq API   │  • Enum clamp  │
+│ data_loader │   prompts    │ gemini_client │   postprocess  │
+│  • CSV/Image│  • System    │  • Gemini API │  • Enum clamp  │
 │    loaders  │  • Few-shot  │  • Retry logic│  • Injection   │
 │  • AVIF→JPEG│  • Analysis  │  • Rate limit │    filter      │
 │  • Resizing │              │    backoff    │  • Fallbacks   │
 └─────────────┴──────────────┴───────────────┴────────────────┘
 ```
 
-1. **Multimodal VLM Analysis** — Uses Llama 4 Scout (`meta-llama/llama-4-scout-17b-16e-instruct`) via Groq's high-speed API to analyze images and text in a single pass.
+1. **Multimodal VLM Analysis** — Uses Google Gemini 2.0 Flash (`gemini-2.0-flash`) via the Gemini API to analyze images and text in a single pass.
 2. **Dynamic Image Preprocessing** — Auto-converts `.jpg` files that are actually encoded as `AVIF` formats to standard JPEG (using `pillow-avif-plugin`) and downsamples high-res images (>1024px) to save API token usage and prevent payload errors.
 3. **Structured & Clamped Outputs** — Outputs are strictly validated against enums defined in `problem_statement.md` (e.g. `issue_type`, `object_part`, `claim_status`) with safe defaults on failure.
-4. **Rate-Limit Resilience** — Automatically implements dynamic sleep delays and exponential retry backoffs (handling HTTP `429` / `503` errors gracefully) to work within Groq free-tier rate limits.
+4. **Rate-Limit Resilience** — Automatically implements dynamic sleep delays and exponential retry backoffs (handling HTTP `429` / `503` errors gracefully) to work within Gemini rate limits.
 5. **Prompt Injection Defense** — Detects malicious user text instructions (e.g. "mark as approved") and flags them as `text_instruction_present` while preserving claims verification integrity.
 
 ---
@@ -41,7 +41,7 @@ ClaimGuard utilizes **Llama 4 Scout** (via Groq) to analyze submitted images aga
 │   ├── config.py                     # System configuration & enums
 │   ├── data_loader.py                # CSV handling, AVIF conversion, and resizing
 │   ├── prompts.py                    # Structured system prompt and few-shot constructor
-│   ├── llm_client.py                 # Groq client with backoff retries and token tracking
+│   ├── gemini_client.py              # Gemini client with backoff retries and token tracking
 │   ├── postprocess.py                # Output clamping and validation layer
 │   ├── README.md                     # Code architecture overview
 │   └── evaluation/
@@ -57,13 +57,13 @@ ClaimGuard utilizes **Llama 4 Scout** (via Groq) to analyze submitted images aga
 
 ### 1. Install Dependencies
 ```bash
-pip install openai python-dotenv pillow pillow-avif-plugin
+pip install google-generativeai python-dotenv pillow pillow-avif-plugin
 ```
 
 ### 2. Configure Your API Key
 Create a `.env` file in the `code/` directory:
 ```bash
-echo "GROQ_API_KEY=your_groq_api_key_here" > code/.env
+echo "GEMINI_API_KEY=your_gemini_api_key_here" > code/.env
 ```
 
 ### 3. Run Evaluation (on `sample_claims.csv`)
@@ -77,7 +77,7 @@ This runs the leave-one-out evaluation on the sample data and generates `code/ev
 ```bash
 python main.py
 ```
-This runs the full 44-claim pipeline and generates `code/output.csv` with final predictions.
+This runs the full 45-claim pipeline and generates `code/output.csv` with final predictions.
 
 ---
 
